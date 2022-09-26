@@ -1,0 +1,26 @@
+{
+  "name": "mvpdatabase",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "create": "node database/createDB.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kjmoyer/MVPDatabase.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kjmoyer/MVPDatabase/issues"
+  },
+  "homepage": "https://github.com/kjmoyer/MVPDatabase#readme",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "dotenv": "^16.0.2",
+    "pg": "^8.8.0"
+  }
+}
