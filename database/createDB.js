@@ -50,6 +50,7 @@ const Client = pg.Client;
           name TEXT,
           class TEXT,
           specId int references specs(specId),
+          secondarySpecId int references specs(specId),
           guildMember bool
           )`)
 
