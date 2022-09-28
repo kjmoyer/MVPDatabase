@@ -1,6 +1,4 @@
 const express = require('express');
-// const path from 'path';
-// const { fileURLToPath } from 'url';
 const pg = require('pg');
 require('dotenv').config();
 const cors = require('cors')
@@ -14,13 +12,10 @@ const pool = new Pool({
   port: process.env.PORT,
 })
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-// app.use(express.static(path.join(__dirname, '../index.html')))
 
 app.get('/chars', (req, res) => {
   pool.query(`SELECT characters.name, characters.secondaryspecid,characters.specid, characters.class, specs.specname, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE guildMember = ${req.query.guildMember} ORDER BY characters.name`)
@@ -51,37 +46,6 @@ app.get('/char', (req, res) => {
       res.status(500).send(err)
     })
 });
-
-// app.get('/char/OS', (req, res) => {
-//   pool.query(`SELECT c.name, c.specId as secondaryspecid , c.class, s.specName, s.specIcon, s.buffs, s.debuffs from characters c INNER JOIN specs s on c.secondaryspecId = s.specId WHERE c.name = $1`, [req.query.name])
-//   .then(async ({ rows }) => {
-//     await Promise.all(rows.map(async (row, index) => {
-//       let data = await pool.query(`SELECT specicon FROM specs where specid = $1`, [row.secondaryspecid]);
-//       rows[index].secondarySpecIcon = data.rows[0].specicon;
-//       }))
-//       // console.log('row after insertion: ', rows[index]);
-//     return rows
-//   })
-//   .then((rows ) => {
-//       res.status(200).send(rows)
-//     })
-//     .catch((err) => {
-//       console.log(err);
-//       res.status(500).send(err);
-//     })
-// })
-
-
-
-// app.get('/char', (req, res) => {
-//   pool.query(`SELECT characters.name, characters.class, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE lower(characters.name) like ${req.query.name}`)
-//     .then(({ rows }) => {
-//       res.status(200).send(rows)
-//     })
-//     .catch((err) => {
-//       res.status(500).send(err);
-//     })
-// });
 
 app.get('/buffs', (req, res) => {
   pool.query(`SELECT * FROM buffs`)
