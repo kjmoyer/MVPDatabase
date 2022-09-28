@@ -2,6 +2,7 @@ const express = require('express');
 const pg = require('pg');
 require('dotenv').config();
 const cors = require('cors')
+const path = require('path')
 const Pool = pg.Pool;
 
 const pool = new Pool({
@@ -14,6 +15,7 @@ const pool = new Pool({
 
 
 const app = express();
+app.use(express.static(path.join(__dirname, '/public')))
 app.use(express.json());
 app.use(cors());
 
