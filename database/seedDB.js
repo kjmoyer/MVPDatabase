@@ -154,7 +154,7 @@ let specs = [
   {
     spec: 'Paladin: Protection',
     class: 'Paladin',
-    icon: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_devotioaura.jpg',
+    icon: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_devotionaura.jpg',
     buffs: [13, 14],
     debuffs: [5]
   },
@@ -196,7 +196,7 @@ let specs = [
   {
     spec: 'Rogue: Combat',
     class: 'Rogue',
-    icon: 'https://wow.zamimg.com/images/wow/icons/medium/ability_rogue_backstab.jpg',
+    icon: 'https://wow.zamimg.com/images/wow/icons/medium/ability_backstab.jpg',
     buffs: [],
     debuffs: [2, 9]
   },
