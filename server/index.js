@@ -40,7 +40,7 @@ app.get('/chars', (req, res) => {
 });
 
 app.get('/char', (req, res) => {
-  pool.query(`SELECT characters.name, characters.class, characters.guildmember, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE characters.name = $1`, [req.query.name])
+  pool.query(`SELECT characters.name, characters.class, characters.guildmember, characters.secondaryspecid, characters.specid, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE characters.name = $1`, [req.query.name])
   .then(async ({ rows }) => {
     await Promise.all(rows.map(async (row, index) => {
       let data = await pool.query(`SELECT specicon, specName, buffs, debuffs FROM specs where specid = $1`, [row.secondaryspecid]);
