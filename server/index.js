@@ -40,11 +40,22 @@ app.get('/chars', (req, res) => {
 });
 
 app.get('/char', (req, res) => {
-  pool.query(`SELECT characters.name, characters.class, characters.guildmember, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE characters.name = $1`, [req.query.name])
-    .then(({ rows }) => {
+  pool.query(`SELECT characters.name, characters.secondaryspecid, characters.specid, characters.class, characters.guildmember, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE characters.name = $1`, [req.query.name])
+  .then(async ({ rows }) => {
+    await Promise.all(rows.map(async (row, index) => {
+      let data = await pool.query(`SELECT specicon, specName, buffs, debuffs FROM specs where specid = $1`, [row.secondaryspecid]);
+      rows[index].secondarySpecIcon = data.rows[0].specicon;
+      rows[index].secondaryBuffs = data.rows[0].buffs;
+      rows[index].secondaryDebuffs = data.rows[0].debuffs;
+      rows[index].secondarySpecName = data.rows[0].specname;
+    }))
+    return rows
+  })
+  .then((rows) => {
       res.status(200).send(rows)
     })
     .catch((err) => {
+      console.log(err)
       res.status(500).send(err)
     })
 });
