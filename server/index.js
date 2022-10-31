@@ -103,6 +103,28 @@ app.get('/specs/buffs', (req, res) => {
     })
 })
 
+app.get('/guild', async (req, res) => {
+  const saltRounds = 5;
+  let guildHash = '';
+    pool.query(`SELECT password FROM guilds WHERE guildname = ${"\'" + req.query.guildname + "\'"}`)
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        throw new Error ('Guild is not registered');
+      }
+      guildHash = rows[0].password;
+      return bcrypt.compare(req.query.password, rows[0].password)
+    })
+    .then((result) => {
+      if (result === false) {
+        throw new Error('Password is incorrect');
+      }
+      res.status(200).send(guildHash);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    })
+})
+
 app.post('/char', (req, res) => {
   let values = [req.body.name, req.body.class, req.body.specid, req.body.secondarySpecid, req.body.guildmember];
   pool.query(`INSERT INTO characters (name, class, specid, secondaryspecid, guildmember) VALUES ($1, $2, $3, $4, $5)`, values)
