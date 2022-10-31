@@ -131,12 +131,10 @@ app.post('/guild', async (req, res) => {
     .catch(err => {
       throw new Error('Password hashing failed, please try again');
     })
-    .then((hash) => {
+    .then(async (hash) => {
       const values = [req.body.guildname, hash];
-      pool.query(`INSERT INTO guilds (guildname, password) VALUES ($1, $2)`, values)
-    })
-    .then(() => {
-      res.status(201).send();
+      await pool.query(`INSERT INTO guilds (guildname, password) VALUES ($1, $2)`, values);
+      res.status(201).send(hash);
     })
     .catch((err) => {
       res.status(400).send(err)
