@@ -121,7 +121,7 @@ app.get('/guild', async (req, res) => {
       res.status(200).send(guildHash);
     })
     .catch((err) => {
-      res.status(400).send(err);
+      res.status(400).send(err.message);
     })
 })
 
@@ -149,9 +149,6 @@ app.post('/guild', async (req, res) => {
     })
     .then(salt => {
       return bcrypt.hash(req.body.password, salt);
-    })
-    .catch(err => {
-      throw new Error('Password hashing failed, please try again');
     })
     .then(async (hash) => {
       const values = [req.body.guildname, hash];
