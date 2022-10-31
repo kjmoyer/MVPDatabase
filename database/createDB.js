@@ -32,28 +32,35 @@ const Client = pg.Client;
       )`)
 
     await client.query(`CREATE TABLE debuffs (
-        buffId SERIAL PRIMARY KEY,
-        effect TEXT,
-        buffIcon TEXT
-        )`)
+      buffId SERIAL PRIMARY KEY,
+      effect TEXT,
+      buffIcon TEXT
+      )`)
 
     await client.query(`CREATE TABLE specs (
-        specId SERIAL PRIMARY KEY,
-        className TEXT,
-        specName TEXT,
-        specIcon TEXT,
-        buffs INT[],
-        debuffs INT[]
-        )`)
-    await client.query(`CREATE TABLE characters (
-          charId SERIAL PRIMARY KEY,
-          name TEXT,
-          class TEXT,
-          specId int references specs(specId),
-          secondarySpecId int references specs(specId),
-          guildMember bool
-          )`)
+      specId SERIAL PRIMARY KEY,
+      className TEXT,
+      specName TEXT,
+      specIcon TEXT,
+      buffs INT[],
+      debuffs INT[]
+      )`)
 
+    await client.query(`CREATE TABLE guilds(
+      guildId SERIAL PRIMARY KEY,
+      guildname TEXT UNIQUE,
+      password TEXT
+      )`)
+
+    await client.query(`CREATE TABLE characters (
+      charId SERIAL PRIMARY KEY,
+      name TEXT UNIQUE,
+      class TEXT,
+      specId int references specs(specId),
+      secondarySpecId int references specs(specId),
+      guildId int references guilds(guildId),
+      guildMember bool
+      )`)
 
     await client.end();
   })();
