@@ -43,7 +43,8 @@ const Client = pg.Client;
       specName TEXT,
       specIcon TEXT,
       buffs INT[],
-      debuffs INT[]
+      debuffs INT[],
+      raidstats INT[]
       )`)
 
     await client.query(`CREATE TABLE guilds(
@@ -61,6 +62,11 @@ const Client = pg.Client;
       guildId int references guilds(guildId),
       guildMember bool
       )`)
+
+    await client.query(`CREATE TABLE raidstats(
+      statid SERIAL PRIMARY KEY,
+      name TEXT
+    )`)
 
     await client.end();
   })();

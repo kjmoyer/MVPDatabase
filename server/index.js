@@ -22,14 +22,15 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/chars', (req, res) => {
-  pool.query(`SELECT characters.name, characters.secondaryspecid,characters.specid, characters.class, specs.specname, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE guildMember = ${req.query.guildMember} ORDER BY characters.name`)
+  pool.query(`SELECT C.name, C.secondaryspecid, C.specid, C.class, S.specname, S.specIcon, S.buffs, S.debuffs, S.raidstats from characters C INNER JOIN specs S on C.specId = S.specId WHERE guildMember = ${req.query.guildMember} and guildid = ${req.query.guildid} ORDER BY C.name`)
     .then(async ({ rows }) => {
       await Promise.all(rows.map(async (row, index) => {
-        let data = await pool.query(`SELECT specicon, specName, buffs, debuffs FROM specs where specid = $1`, [row.secondaryspecid]);
+        let data = await pool.query(`SELECT specicon, specName, buffs, debuffs, raidstats FROM specs where specid = $1`, [row.secondaryspecid]);
         rows[index].secondarySpecIcon = data.rows[0].specicon;
         rows[index].secondaryBuffs = data.rows[0].buffs;
         rows[index].secondaryDebuffs = data.rows[0].debuffs;
         rows[index].secondarySpecName = data.rows[0].specname;
+        rows[index].secondaryRaidStats = data.rows[0].raidstats;
       }))
       return rows
     })
@@ -42,14 +43,15 @@ app.get('/chars', (req, res) => {
 });
 
 app.get('/char', (req, res) => {
-  pool.query(`SELECT characters.name, characters.class, characters.guildmember, characters.secondaryspecid, characters.specid, specs.specName, specs.specIcon, specs.buffs, specs.debuffs from characters INNER JOIN specs on characters.specId = specs.specId WHERE characters.name = $1`, [req.query.name])
+  pool.query(`SELECT C.name, C.class, C.guildmember, C.secondaryspecid, C.specid, S.specName, S.specIcon, S.buffs, S.debuffs, S.raidstats from characters C INNER JOIN specs S on C.specId = S.specId WHERE C.name = $1`, [req.query.name])
     .then(async ({ rows }) => {
       await Promise.all(rows.map(async (row, index) => {
-        let data = await pool.query(`SELECT specicon, specName, buffs, debuffs FROM specs where specid = $1`, [row.secondaryspecid]);
+        let data = await pool.query(`SELECT specicon, specName, buffs, debuffs, raidstats FROM specs where specid = $1`, [row.secondaryspecid]);
         rows[index].secondarySpecIcon = data.rows[0].specicon;
         rows[index].secondaryBuffs = data.rows[0].buffs;
         rows[index].secondaryDebuffs = data.rows[0].debuffs;
         rows[index].secondarySpecName = data.rows[0].specname;
+        rows[index].secondaryRaidStats = data.rows[0].raidstats;
       }))
       return rows
     })
@@ -105,20 +107,20 @@ app.get('/specs/buffs', (req, res) => {
 
 app.get('/guild', async (req, res) => {
   const saltRounds = 5;
-  let guildHash = '';
-    pool.query(`SELECT password FROM guilds WHERE guildname = ${"\'" + req.query.guildname + "\'"}`)
+  let guildid = '';
+    pool.query(`SELECT password, guildid FROM guilds WHERE guildname = ${"\'" + req.query.guildname + "\'"}`)
     .then(({ rows }) => {
       if (rows.length === 0) {
         throw new Error ('Guild is not registered');
       }
-      guildHash = rows[0].password;
+      guildid = rows[0].guildid;
       return bcrypt.compare(req.query.password, rows[0].password)
     })
     .then((result) => {
       if (result === false) {
         throw new Error('Password is incorrect');
       }
-      res.status(200).send(guildHash);
+      res.status(200).send(JSON.stringify(guildid));
     })
     .catch((err) => {
       res.status(400).send(err.message);
@@ -126,8 +128,8 @@ app.get('/guild', async (req, res) => {
 })
 
 app.post('/char', (req, res) => {
-  let values = [req.body.name, req.body.class, req.body.specid, req.body.secondarySpecid, req.body.guildmember];
-  pool.query(`INSERT INTO characters (name, class, specid, secondaryspecid, guildmember) VALUES ($1, $2, $3, $4, $5)`, values)
+  let values = [req.body.name, req.body.class, req.body.specid, req.body.secondarySpecid, req.body.guildmember, req.body.guildid];
+  pool.query(`INSERT INTO characters (name, class, specid, secondaryspecid, guildmember, guildid) VALUES ($1, $2, $3, $4, $5, $6)`, values)
     .then(({ rows }) => {
       res.status(200).send(rows)
     })
@@ -137,7 +139,7 @@ app.post('/char', (req, res) => {
 })
 
 app.post('/guild', async (req, res) => {
-  pool.query(`SELECT guildid FROM guilds`)
+  pool.query(`SELECT guildid FROM guilds WHERE guildname = ${"\'" + req.query.guildname + "\'"}`)
     .then(({ rows }) => {
       if (rows.length > 0) {
         throw new Error('Guild already exists, please log in with the guild name and password');
@@ -153,7 +155,13 @@ app.post('/guild', async (req, res) => {
     .then(async (hash) => {
       const values = [req.body.guildname, hash];
       await pool.query(`INSERT INTO guilds (guildname, password) VALUES ($1, $2)`, values);
-      res.status(201).send(hash);
+      return hash;
+    })
+    .then((hash) => {
+      return pool.query(`SELECT guildid FROM guilds WHERE password = ${"\'" + hash + "\'"}`)
+    })
+    .then(({ rows }) => {
+      res.status(200).send(JSON.stringify(rows[0].guildid));
     })
     .catch((err) => {
       res.status(400).send(err)
