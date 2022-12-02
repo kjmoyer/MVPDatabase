@@ -127,6 +127,16 @@ app.get('/guild', async (req, res) => {
     })
 })
 
+app.get('/guilds', (req, res) => {
+  pool.query(`SELECT guildname FROM guilds`)
+    .then((result) => {
+      res.status(200).send(result.rows)
+    })
+    .catch((err) => {
+      res.status(400).send(err)
+    })
+})
+
 app.post('/char', (req, res) => {
   let values = [req.body.name, req.body.class, req.body.specid, req.body.secondarySpecid, req.body.guildmember, req.body.guildid];
   pool.query(`INSERT INTO characters (name, class, specid, secondaryspecid, guildmember, guildid) VALUES ($1, $2, $3, $4, $5, $6)`, values)
