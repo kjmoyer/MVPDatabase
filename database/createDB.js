@@ -55,12 +55,13 @@ const Client = pg.Client;
 
     await client.query(`CREATE TABLE characters (
       charId SERIAL PRIMARY KEY,
-      name TEXT UNIQUE,
+      name TEXT,
       class TEXT,
       specId int references specs(specId),
       secondarySpecId int references specs(specId),
       guildId int references guilds(guildId),
-      guildMember bool
+      guildMember bool,
+      UNIQUE (name, guildId)
       )`)
 
     await client.query(`CREATE TABLE raidstats(

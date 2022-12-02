@@ -43,7 +43,7 @@ app.get('/chars', (req, res) => {
 });
 
 app.get('/char', (req, res) => {
-  pool.query(`SELECT C.name, C.class, C.guildmember, C.secondaryspecid, C.specid, S.specName, S.specIcon, S.buffs, S.debuffs, S.raidstats from characters C INNER JOIN specs S on C.specId = S.specId WHERE C.name = $1`, [req.query.name])
+  pool.query(`SELECT C.name, C.class, C.guildmember, C.secondaryspecid, C.specid, S.specName, S.specIcon, S.buffs, S.debuffs, S.raidstats from characters C INNER JOIN specs S on C.specId = S.specId WHERE C.name = $1 AND C.guildid = $2`, [req.query.name, req.query.guildid])
     .then(async ({ rows }) => {
       await Promise.all(rows.map(async (row, index) => {
         let data = await pool.query(`SELECT specicon, specName, buffs, debuffs, raidstats FROM specs where specid = $1`, [row.secondaryspecid]);
@@ -169,7 +169,7 @@ app.post('/guild', async (req, res) => {
 })
 
 app.delete('/char', (req, res) => {
-  pool.query(`DELETE FROM characters WHERE name='${req.query[0]}'`)
+  pool.query(`DELETE FROM characters WHERE name = $1 AND guildid = $2`, [req.query.name, req.query.guildid])
     .then(() => {
       res.status(201).send();
     })
@@ -180,8 +180,8 @@ app.delete('/char', (req, res) => {
 
 app.put('/char', (req, res) => {
   const char = req.body;
-  const values = [char.class, char.specid, char.secondarySpecid, char.guildmember, char.name];
-  pool.query(`UPDATE characters SET class = $1, specId = $2, secondarySpecid = $3, guildmember = $4 where name = $5`, values)
+  const values = [char.class, char.specid, char.secondarySpecid, char.guildmember, char.name, char.guildid];
+  pool.query(`UPDATE characters SET class = $1, specId = $2, secondarySpecid = $3, guildmember = $4 where name = $5 AND guildid = $6`, values)
     .then(() => {
       res.status(201).send();
     })

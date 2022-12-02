@@ -49,8 +49,8 @@ let raidstats = [
   `ranged`,
   `melee`,
   `interrupts`,
-  `Battle Rezs`,
-  `Crowd Control`
+  `battle rezs`,
+  `crowd control`
 ]
 
 let specs = [
@@ -172,13 +172,13 @@ let specs = [
     icon: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_auraoflight.jpg',
     buffs: [10, 11, 14, 19, 20],
     debuffs: [7, 8],
-    raidstats: [1, 7]
+    raidstats: [4, 7]
   },
   {
     spec: 'Priest: Discipline',
     class: 'Priest',
     icon: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_wordfortitude.jpg',
-    buffs: [4, 5, 19],
+    buffs: [4, 5],
     debuffs: [],
     raidstats: [2]
   },
@@ -194,7 +194,7 @@ let specs = [
     spec: 'Priest: Shadow',
     class: 'Priest',
     icon: 'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_shadowwordpain.jpg',
-    buffs: [4, 5, 22],
+    buffs: [4, 5, 19, 22],
     debuffs: [],
     raidstats: [2]
   },
